@@ -9,16 +9,26 @@ import com.google.gson.annotations.SerializedName;
 
 public class CommonModal<T> {
 
+    @SerializedName("function")
+    @Expose
+    private String function;
     @SerializedName("status")
     @Expose
     private boolean status;
-    @SerializedName("userData")
-    @Expose
-    private T body;
     @SerializedName("message")
     @Expose
-    private String function;
+    private String message;
+    @SerializedName("data")
+    @Expose
+    private T data;
 
+    public String getFunction() {
+        return function;
+    }
+
+    public void setFunction(String function) {
+        this.function = function;
+    }
 
     public boolean isStatus() {
         return status;
@@ -28,19 +38,20 @@ public class CommonModal<T> {
         this.status = status;
     }
 
-    public T getBody() {
-        return body;
+    public String getMessage() {
+        return message;
     }
 
-    public void setBody(T body) {
-        this.body = body;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
-    public String getFunction() {
-        return function;
+    public T getData() {
+        return data;
     }
 
-    public void setFunction(String function) {
-        this.function = function;
+    public void setData(T data) {
+        this.data = data;
     }
+
 }

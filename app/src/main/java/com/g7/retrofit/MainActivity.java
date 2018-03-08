@@ -1,15 +1,15 @@
 package com.g7.retrofit;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,23 +19,23 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Response;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity {
 
     private TextView mResponseTv;
-    private APIService mAPIService;
     private String TAG = "Retrofit";
+    private SharedPreferences sharedpreferences = null;
+    private SharedPreferences.Editor editor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        sharedpreferences = getSharedPreferences("prefs",
+                Context.MODE_PRIVATE);
+        editor = sharedpreferences.edit();
         final EditText titleEt = (EditText) findViewById(R.id.et_title);
         final EditText bodyEt = (EditText) findViewById(R.id.et_body);
         Button btn_submit_post = (Button) findViewById(R.id.btn_submit_post);
@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         Button btn_submit_multi = (Button) findViewById(R.id.btn_submit_multi);
         mResponseTv = (TextView) findViewById(R.id.tv_response);
 
-        mAPIService = ApiUtils.getAPIService();
 
         btn_submit_post.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,32 +63,24 @@ public class MainActivity extends AppCompatActivity {
         btn_submit_multi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendMultiPart();
+//                sendMultiPart();
+                Print.e("home");
+                home();
             }
         });
+        SingletonHolder.getInstance().setPrefs(sharedpreferences);
+        SingletonHolder.getInstance().setEditor(editor);
     }
 
-    public void sendPost(String title, String body) {
-        // RxJava
-        mAPIService.login(title, body).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<CommonModal<UserPojo>>() {
-                    @Override
-                    public void onCompleted() {
+    public void sendPost(String name, String pass) {
+        Print.e("login");
+        new WebServices(this).login(name, pass);
 
-                    }
+    }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, e.getMessage());
-                    }
 
-                    @Override
-                    public void onNext(CommonModal<UserPojo> post) {
-                        if (post.isStatus())
-                            showResponse(post.getBody().toString());
-                        else Toast.makeText(MainActivity.this, "Failure", Toast.LENGTH_LONG).show();
-                    }
-                });
+    public void home() {
+        String abc = new WebServices(this).home();
     }
 
     public void sendGet() {
